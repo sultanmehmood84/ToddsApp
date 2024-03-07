@@ -1,0 +1,16 @@
+USE [toddsdb]
+GO
+/****** Object:  Table [dbo].[sample]    Script Date: 05/03/2024 4:24:34 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[sample](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[TextStr] [varchar](50) NULL,
+ CONSTRAINT [PK_sample] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
