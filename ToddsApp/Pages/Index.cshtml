@@ -1,0 +1,112 @@
+﻿@page
+@using Kendo.Mvc.UI;
+@using ToddsAPI.Models;
+@using ToddsApp.Pages
+@using System.Net.Http
+@using System.Text.Json
+
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col">
+                <form id="myForm">
+                    <div class="form-group row">
+                        <label for="inputField" class="col-sm-2 col-form-label">Text Field</label>
+                        <div class="col-sm-8">
+                            <input type="text" maxlength="50" class="form-control" required="required" id="inputField" placeholder="Enter something">
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" onclick="saveDataToDatabase();" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-10">
+            <div class="col">
+                <div class="form-group row">
+                    <div class="col-sm-2 mt-5">
+                        <button class="btn btn-primary" id="refreshButton" onclick="refreshGrid();">Load</button>
+                    </div>
+                    <!-- Include the Telerik Grid component -->
+                    <div id="grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Grid<Sample>(Model.Samples) 
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Id);
+        columns.Bound(p => p.TextStr).Width(150).MinScreenWidth(800);        
+    })
+    .Scrollable()    
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Model(model =>
+        {
+            model.Id(p => p.Id);
+            model.Field(p => p.TextStr);
+        })
+    )
+)
+
+
+<script>
+    function saveDataToDatabase() {
+        const textFieldValue = document.getElementById('inputField').value;
+
+        fetch('http://localhost:5190/api/postdata', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                TextStr: textFieldValue
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Data saved successfully:', data);
+                // Optionally, update UI or perform other actions after saving data
+            })
+            .catch(error => {
+                alert('Error:', error);
+            });
+    }
+
+   
+    function refreshGrid(){
+        
+            $("#Grid").data("kendoGrid").destroy();
+
+            // Re-create the grid with updated data
+            $("#Grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "http://localhost:5190/api/getdata",
+                            dataType: "json"
+                        }
+                    }
+                },
+                
+            });
+        
+    }
+</script>
